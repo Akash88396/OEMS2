@@ -1,0 +1,71 @@
+{% extends 'base.html' %}
+
+{% block title %}AI Question Generator | Faculty Portal{% endblock %}
+
+{% block content %}
+<div class="max-w-4xl mx-auto py-8 px-4">
+    
+    <div class="flex justify-between items-center mb-8">
+        <div>
+            <h1 class="text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-teal-600 to-blue-600">
+                <i class="fas fa-magic mr-2 text-teal-600"></i> AI Question Generator
+            </h1>
+            <p class="text-gray-500 mt-1">Harness the power of AI to instantly build your question bank.</p>
+        </div>
+        <a href="{% url 'question_bank' %}" class="bg-gray-200 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-300 transition font-medium">
+            <i class="fas fa-arrow-left mr-2"></i> Back to Bank
+        </a>
+    </div>
+
+    <div class="bg-white rounded-xl shadow-lg border border-teal-100 overflow-hidden">
+        
+        <form method="POST" class="p-8" id="aiForm">
+            {% csrf_token %}
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                <div>
+                    <label class="block text-gray-700 font-bold mb-2 text-sm uppercase">Target Subject <span class="text-red-500">*</span></label>
+                    <select name="subject" required class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 bg-gray-50">
+                        <option value="">-- Select Subject --</option>
+                        {% for sub in subjects %}
+                            <option value="{{ sub.id }}">{{ sub.code }} - {{ sub.name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-gray-700 font-bold mb-2 text-sm uppercase">Topic to Generate From <span class="text-red-500">*</span></label>
+                    <input type="text" name="topic" required placeholder="e.g., Normalization, SQL Joins, Cloud Computing" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500">
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+                <div>
+                    <label class="block text-gray-700 font-bold mb-2 text-sm uppercase">Difficulty Level <span class="text-red-500">*</span></label>
+                    <select name="difficulty" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 bg-gray-50">
+                        <option value="easy">Easy</option>
+                        <option value="medium" selected>Medium</option>
+                        <option value="hard">Hard</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-gray-700 font-bold mb-2 text-sm uppercase">Number of Questions <span class="text-red-500">*</span></label>
+                    <input type="number" name="num_questions" min="1" max="10" value="5" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500">
+                    <p class="text-xs text-gray-400 mt-1">Generate up to 10 questions at a time.</p>
+                </div>
+            </div>
+
+            <div id="loadingOverlay" class="hidden flex-col items-center justify-center p-6 bg-teal-50 rounded-lg border border-teal-200 mb-6">
+                <i class="fas fa-spinner fa-spin text-4xl text-teal-600 mb-3"></i>
+                <p class="text-teal-800 font-bold text-lg animate-pulse">The AI is thinking...</p>
+                <p class="text-sm text-teal-600">Generating questions and saving to database. Please wait.</p>
+            </div>
+
+            <div class="flex justify-end border-t pt-6">
+                <button type="submit" onclick="document.getElementById('loadingOverlay').classList.remove('hidden');" class="bg-gradient-to-r from-teal-600 to-blue-600 text-white font-bold py-3 px-8 rounded-lg shadow-lg hover:shadow-xl transition transform hover:-translate-y-1">
+                    <i class="fas fa-brain mr-2"></i> Generate Questions
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

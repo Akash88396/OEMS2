@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ exam.title }} | Live Exam</title>
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/blazeface"></script>
+</head>
+<body class="bg-gray-100 h-screen overflow-hidden flex flex-col font-sans">
+
+    <header class="bg-blue-900 text-white shadow-md flex justify-between items-center px-6 py-3 shrink-0">
+        <div class="flex items-center space-x-4">
+            <i class="fas fa-laptop-code text-2xl"></i>
+            <div>
+                <h1 class="text-lg font-bold">{{ exam.title }}</h1>
+                <p class="text-sm text-blue-200">{{ exam.subject.name }} ({{ exam.subject.code }})</p>
+            </div>
+        </div>
+        
+        <div class="bg-red-600 px-4 py-2 rounded-lg font-mono text-xl font-bold shadow-inner border border-red-800 flex items-center space-x-2">
+            <i class="fas fa-stopwatch"></i>
+            <span id="timerDisplay">00:00:00</span>
+        </div>
+        
+        <div class="text-right">
+            <p class="font-semibold">{{ user.username }}</p>
+            <p class="text-sm text-blue-200">ID: {{ user.id }}</p>
+        </div>
+    </header>
+
+    <div class="flex flex-1 overflow-hidden">
+        
+        <main class="flex-1 bg-white m-4 rounded-xl shadow-sm border p-8 overflow-y-auto">
+            <input type="hidden" id="studentExamId" value="{{ student_exam.id }}">
+            {% for question in questions %}
+            <div class="question-block mb-10 border-b pb-8" id="q-{{ forloop.counter }}">
+                <div class="flex justify-between items-start mb-4">
+                    <h2 class="text-xl font-semibold text-gray-800">
+                        <span class="text-blue-600 mr-2">Q{{ forloop.counter }}.</span> 
+                        {{ question.text }}
+                    </h2>
+                    <span class="bg-gray-100 text-gray-600 text-xs px-2 py-1 rounded border">{{ question.marks }} Mark(s)</span>
+                </div>
+                
+                <div class="space-y-3 pl-8 mt-6">
+                    {% for opt in question.shuffled_options %}
+                    <label class="flex items-center space-x-3 p-3 border rounded-lg hover:bg-blue-50 cursor-pointer transition">
+                        <input type="radio" name="q_{{ question.id }}" value="{{ opt.orig }}" class="w-5 h-5 text-blue-600 answer-radio" data-question-id="{{ question.id }}" {% if question.selected_option == opt.orig %}checked{% endif %}>
+                        
+                        <span class="font-bold text-gray-700 mr-2">{{ opt.display }}.</span>
+                        <span class="text-gray-700">{{ opt.text }}</span>
+                    </label>
+                    {% endfor %}
+                </div>
+            </div>
+            {% empty %}
+            <p class="text-center text-gray-500 mt-10">No questions available for this exam.</p>
+            {% endfor %}
+            
+            <div class="flex justify-end mt-8">
+                <button id="submitBtn" class="bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-8 rounded-lg shadow-lg transition transform hover:-translate-y-1">
+                    Submit Final Exam
+                </button>
+            </div>
+        </main>
+
+        <aside class="w-80 bg-gray-50 border-l flex flex-col shrink-0">
+            <div class="h-48 bg-black m-4 rounded-lg flex items-center justify-center relative overflow-hidden shadow-inner border-2 border-transparent transition-colors duration-300" id="videoContainer">
+                <video id="webcam" autoplay muted playsinline class="w-full h-full object-cover transform scale-x-[-1]"></video> <div class="absolute bottom-2 left-2 flex items-center space-x-2 z-10">
+                    <div class="w-2 h-2 bg-red-500 rounded-full animate-pulse"></div>
+                    <span class="text-xs text-white bg-black bg-opacity-50 px-1 rounded">REC</span>
+                </div>
+                <p id="aiStatusText" class="absolute bottom-2 right-2 text-xs text-white bg-black bg-opacity-50 px-1 rounded z-10">AI Proctoring Active</p>
+                
+                <div id="warningOverlay" class="absolute inset-0 bg-red-600 bg-opacity-80 hidden flex-col justify-center items-center z-20">
+                    <i class="fas fa-exclamation-triangle text-white text-3xl mb-2"></i>
+                    <p class="text-white text-sm font-bold text-center px-2">WARNING: Please look at the screen!</p>
+                </div>
+            </div>
+
+            <div class="flex-1 p-4 overflow-y-auto">
+                <h3 class="font-bold text-gray-700 mb-4 border-b pb-2">Question Palette</h3>
+                <div class="grid grid-cols-4 gap-2">
+                    {% for question in questions %}
+                    <a href="#q-{{ forloop.counter }}" class="w-10 h-10 flex items-center justify-center rounded-full {% if question.selected_option %}bg-green-500 text-white border-green-600{% else %}bg-white border border-gray-300 text-gray-600{% endif %} text-sm font-semibold hover:bg-blue-100 hover:border-blue-400 transition">
+                        {{ forloop.counter }}
+                    </a>
+                    {% endfor %}
+                </div>
+                
+                <div class="mt-8 space-y-2 text-xs text-gray-600">
+                    <div class="flex items-center space-x-2"><div class="w-4 h-4 bg-white border rounded"></div><span>Not Visited</span></div>
+                    <div class="flex items-center space-x-2"><div class="w-4 h-4 bg-green-500 rounded text-white flex items-center justify-center"><i class="fas fa-check text-[8px]"></i></div><span>Answered</span></div>
+                </div>
+            </div>
+        </aside>
+    </div>
+
+<script>
+        const studentExamId = document.getElementById('studentExamId').value;
+        // --- AI Proctoring & Webcam Initialization ---
+        const video = document.getElementById('webcam');
+        const warningOverlay = document.getElementById('warningOverlay');
+        let aiModel;
+
+        // 1. Start the Camera
+        navigator.mediaDevices.getUserMedia({ video: true, audio: false })
+            .then(stream => {
+                video.srcObject = stream;
+                // Once camera is playing, load the AI
+                video.addEventListener('loadeddata', loadAIModel);
+            })
+            .catch(err => {
+                console.error("Webcam access denied:", err);
+                alert("Camera access is required. Please enable it.");
+            });
+
+        // 2. Load TensorFlow BlazeFace
+        async function loadAIModel() {
+            try {
+                const statusText = document.getElementById('aiStatusText');
+                
+                // Change the text to show it's loading
+                statusText.innerText = "Loading AI Core...";
+                
+                aiModel = await blazeface.load();
+                
+                statusText.innerText = "AI Proctoring Active";
+                console.log("AI Model Loaded Successfully.");
+                
+                // Run the scanner every 2.5 seconds
+                setInterval(scanFace, 2500); 
+            } catch (error) {
+                console.error("Failed to load AI model", error);
+            }
+        }
+
+// 3. The Upgraded Surveillance Engine (with Head Rotation)
+        async function scanFace() {
+            if (!aiModel || !video.srcObject) return;
+
+            // Analyze the current video frame
+            const predictions = await aiModel.estimateFaces(video, false);
+            
+            let violationDetected = false;
+            let warningMessage = "";
+
+            if (predictions.length === 0) {
+                // Rule 1: Left the camera frame
+                violationDetected = true;
+                warningMessage = "WARNING: No face detected in frame!";
+            } else if (predictions.length > 1) {
+                // Rule 2: Multiple people
+                violationDetected = true;
+                warningMessage = "WARNING: Multiple faces detected!";
+            } else {
+                // Rule 3: Head Rotation Tracking (Geometry Approximation)
+                const landmarks = predictions[0].landmarks;
+                
+                // BlazeFace landmarks array: [rightEye, leftEye, nose, mouth, rightEar, leftEar]
+                const rightEye = landmarks[0];
+                const leftEye = landmarks[1];
+                const nose = landmarks[2];
+
+                // Calculate Euclidean distance from nose to each eye
+                const distRightEyeToNose = Math.sqrt(Math.pow(rightEye[0] - nose[0], 2) + Math.pow(rightEye[1] - nose[1], 2));
+                const distLeftEyeToNose = Math.sqrt(Math.pow(leftEye[0] - nose[0], 2) + Math.pow(leftEye[1] - nose[1], 2));
+
+                // Calculate the ratio of the distances
+                // Looking straight ahead = ~1.0
+                const ratio = distLeftEyeToNose / distRightEyeToNose;
+
+                // If ratio is > 2.0 (looking hard left) or < 0.5 (looking hard right)
+                if (ratio > 2.2 || ratio < 0.45) {
+                    violationDetected = true;
+                    warningMessage = "WARNING: Suspicious head rotation detected! Please look at the screen.";
+                }
+            }
+
+            // If a rule is broken, trigger the alert and tell the Django server
+            if (violationDetected) {
+                triggerWarning(warningMessage);
+            }
+        }
+
+        // 4. Handle the Violation
+        function triggerWarning(message) {
+            // Flash the red overlay on screen
+            warningOverlay.querySelector('p').innerText = message;
+            warningOverlay.classList.remove('hidden');
+            warningOverlay.classList.add('flex');
+            
+            // Turn the camera border red
+            video.parentElement.classList.add('border-red-600');
+
+            // Send signal to Django backend to record the malpractice
+            fetch('/exams/api/log_warning/', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({ student_exam_id: studentExamId })
+            })
+            .then(response => response.json())
+            .then(data => {
+                console.log("Database updated. Total Warnings:", data.warnings);
+            })
+            .catch(err => console.error("Failed to log warning:", err));
+
+            // Hide the warning after 3 seconds
+            setTimeout(() => {
+                warningOverlay.classList.remove('flex');
+                warningOverlay.classList.add('hidden');
+                video.parentElement.classList.remove('border-red-600');
+            }, 3000);
+        }
+
+        const radioButtons = document.querySelectorAll('.answer-radio');
+
+        // --- 1. Save Answer Logic ---
+        radioButtons.forEach(radio => {
+            radio.addEventListener('change', function() {
+                const questionId = this.getAttribute('data-question-id');
+                const selectedOption = this.value;
+
+                fetch('/exams/api/save_answer/', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({
+                        student_exam_id: studentExamId,
+                        question_id: questionId,
+                        selected_option: selectedOption
+                    })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if(data.status === 'success') {
+                        // Turn palette green
+                        const allQuestions = document.querySelectorAll('.question-block');
+                        let index = Array.from(allQuestions).findIndex(block => block.id === `q-${questionId}`) + 1;
+                        const paletteNode = document.querySelectorAll('.grid.grid-cols-4.gap-2 a')[index-1];
+                        if (paletteNode) {
+                            paletteNode.classList.remove('bg-white', 'border-gray-300', 'text-gray-600');
+                            paletteNode.classList.add('bg-green-500', 'text-white', 'border-green-600');
+                        }
+                    }
+                }).catch(err => console.error(err));
+            });
+        });
+
+
+        // --- 3. Timer Logic ---
+        let totalSeconds = {{ time_left_seconds }};
+        const timerDisplay = document.getElementById('timerDisplay');
+        let timerInterval;
+
+        function updateTimer() {
+            let hours = Math.floor(totalSeconds / 3600);
+            let minutes = Math.floor((totalSeconds % 3600) / 60);
+            let seconds = totalSeconds % 60;
+
+            timerDisplay.textContent = 
+                String(hours).padStart(2, '0') + ':' + 
+                String(minutes).padStart(2, '0') + ':' + 
+                String(seconds).padStart(2, '0');
+
+            if (totalSeconds <= 0) {
+                clearInterval(timerInterval);
+                timerDisplay.textContent = "00:00:00";
+                alert("Time is up! Your exam is being automatically submitted.");
+                submitFinalExam(); 
+            } else {
+                totalSeconds--;
+                if (totalSeconds < 300) {
+                    timerDisplay.parentElement.classList.replace('bg-blue-600', 'bg-red-600');
+                    timerDisplay.parentElement.classList.add('animate-pulse');
+                }
+            }
+        }
+
+        timerInterval = setInterval(updateTimer, 1000);
+        updateTimer();
+
+        // --- SECURITY LOGIC: Prevent Back Button ---
+        history.pushState(null, null, location.href);
+        window.onpopstate = function () {
+            history.go(1);
+        };
+
+        // --- SECURITY LOGIC: Warn on Refresh ---
+        // 1. Create a named function so we can accurately remove it later
+        function preventLeave(e) {
+            e.preventDefault();
+            e.returnValue = 'Refreshing the page will not reset your timer. Are you sure?';
+        }
+
+        // 2. Attach the lock
+        window.addEventListener('beforeunload', preventLeave);
+
+        // --- Submit Exam Logic ---
+        function submitFinalExam() {
+            // Change button text so the student knows it's working
+            const btn = document.getElementById('submitBtn');
+            btn.innerText = "Submitting...";
+            btn.disabled = true;
+
+            fetch('/exams/api/submit_exam/', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({ student_exam_id: studentExamId })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if(data.status === 'success') {
+                    window.location.href = data.redirect_url; 
+                } else if (data.message === 'Exam already submitted') {
+                    // If they accidentally double-clicked, just take them to the result page anyway
+                    window.location.href = `/exams/result/${studentExamId}/`;
+                } else {
+                    alert('Error submitting exam. Please contact admin.');
+                    btn.innerText = "Submit Final Exam";
+                    btn.disabled = false;
+                }
+            }).catch(err => {
+                console.error(err);
+                btn.innerText = "Submit Final Exam";
+                btn.disabled = false;
+            });
+        }
+
+        // 3. Remove the warning ONLY when they intentionally click the button
+        document.getElementById('submitBtn').addEventListener('click', function() {
+            if(confirm('Are you sure you want to submit the exam? You cannot change answers after this.')) {
+                // Properly remove the lock using the named function
+                window.removeEventListener('beforeunload', preventLeave); 
+                submitFinalExam();
+            }
+        });
+    </script>
+</body>
+</html>

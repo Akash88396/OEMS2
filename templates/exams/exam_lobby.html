@@ -1,0 +1,47 @@
+{% extends 'base.html' %}
+
+{% block title %}Exam Lobby | {{ exam.title }}{% endblock %}
+
+{% block content %}
+<div class="max-w-4xl mx-auto py-10">
+    <div class="bg-white rounded-xl shadow-lg overflow-hidden border border-gray-200">
+        
+        <div class="bg-blue-900 px-8 py-6 text-white text-center">
+            <h1 class="text-3xl font-bold mb-2">Examination Lobby</h1>
+            <p class="text-blue-200">{{ exam.title }} - {{ exam.subject.name }}</p>
+        </div>
+
+        <div class="p-8">
+            <h3 class="text-xl font-bold text-gray-800 mb-4 border-b pb-2"><i class="fas fa-clipboard-list mr-2 text-primary"></i> Mandatory Instructions</h3>
+            
+            <div class="bg-blue-50 border-l-4 border-blue-600 p-6 rounded-r-lg mb-8 text-gray-700 whitespace-pre-line leading-relaxed">
+                {{ exam.instructions }}
+            </div>
+
+            <div class="grid grid-cols-2 gap-4 mb-8 bg-gray-50 p-6 rounded-lg border border-gray-200">
+                <div>
+                    <p class="text-sm text-gray-500 uppercase font-bold">Duration</p>
+                    <p class="text-lg font-semibold text-gray-800">{{ exam.duration_minutes }} Minutes</p>
+                </div>
+                <div>
+                    <p class="text-sm text-gray-500 uppercase font-bold">Total Marks</p>
+                    <p class="text-lg font-semibold text-gray-800">{{ exam.total_marks }} Marks</p>
+                </div>
+            </div>
+
+            <div class="text-center pt-6 border-t">
+                {% if exam_active %}
+                    <a href="{% url 'exam_console' exam.id %}" class="inline-block bg-green-600 text-white font-bold py-4 px-12 rounded-lg shadow-lg hover:bg-green-700 transition transform hover:scale-105 text-lg">
+                        I Agree, Start Examination
+                    </a>
+                {% else %}
+                    <button disabled class="bg-gray-300 text-gray-500 font-bold py-4 px-12 rounded-lg cursor-not-allowed text-lg">
+                        <i class="fas fa-lock mr-2"></i> Exam Starts at {{ exam.start_time|time:"h:i A" }}
+                    </button>
+                    <p class="text-sm text-gray-500 mt-3 animate-pulse">Waiting for the exam window to open...</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

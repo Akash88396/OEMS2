@@ -1,0 +1,128 @@
+{% extends 'base.html' %}
+
+{% block title %}Admin Dashboard | ExamControl{% endblock %}
+
+{% block content %}
+<div class="flex h-[calc(100vh-80px)]"> <aside class="w-64 bg-white shadow-lg border-r hidden md:block">
+        <div class="p-6">
+            <h2 class="text-xs uppercase text-gray-400 font-bold tracking-wider mb-4">Core Modules</h2>
+            <nav class="space-y-2">
+                <a href="#" class="flex items-center space-x-3 text-primary bg-blue-50 px-4 py-3 rounded-lg font-medium">
+                    <i class="fas fa-chart-pie"></i>
+                    <span>Overview</span>
+                </a>
+                <a href="{% url 'admin_results' %}" class="flex items-center space-x-3 text-gray-600 hover:bg-gray-50 hover:text-primary px-4 py-3 rounded-lg transition font-medium">
+                    <i class="fas fa-poll w-5"></i>
+                    <span>Exam Results & Logs</span>
+                </a>
+                <a href="#" class="flex items-center space-x-3 text-gray-600 hover:bg-gray-50 px-4 py-3 rounded-lg transition">
+                    <i class="fas fa-users"></i>
+                    <span>Manage Users</span>
+                </a>
+                <a href="#" class="flex items-center space-x-3 text-gray-600 hover:bg-gray-50 px-4 py-3 rounded-lg transition">
+                    <i class="fas fa-book"></i>
+                    <span>Courses & Subjects</span>
+                </a>
+                <a href="#" class="flex items-center space-x-3 text-gray-600 hover:bg-gray-50 px-4 py-3 rounded-lg transition">
+                    <i class="fas fa-clock"></i>
+                    <span>Exams Schedule</span>
+                </a>
+
+            </nav>
+        </div>
+    </aside>
+
+    <main class="flex-1 p-8 overflow-y-auto bg-gray-50">
+        
+        <div class="flex justify-between items-center mb-8">
+            <h1 class="text-3xl font-bold text-gray-800">Admin Dashboard</h1>
+            <button class="bg-primary text-white px-4 py-2 rounded-lg shadow hover:bg-blue-700 transition">
+                <i class="fas fa-plus mr-2"></i> Create New Exam
+            </button>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+            <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100 flex items-center">
+                <div class="p-4 bg-blue-100 text-primary rounded-full mr-4">
+                    <i class="fas fa-user-graduate text-xl"></i>
+                </div>
+                <div>
+                    <p class="text-sm text-gray-500">Total Students</p>
+                    <h3 class="text-2xl font-bold">{{ total_students }}</h3>
+                </div>
+            </div>
+
+            <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100 flex items-center">
+                <div class="p-4 bg-green-100 text-green-600 rounded-full mr-4">
+                    <i class="fas fa-chalkboard-teacher text-xl"></i>
+                </div>
+                <div>
+                    <p class="text-sm text-gray-500">Active Faculty</p>
+                    <h3 class="text-2xl font-bold">{{ total_faculty }}</h3>
+                </div>
+            </div>
+
+            <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100 flex items-center">
+                <div class="p-4 bg-purple-100 text-purple-600 rounded-full mr-4">
+                    <i class="fas fa-file-alt text-xl"></i>
+                </div>
+                <div>
+                    <p class="text-sm text-gray-500">Exams Today</p>
+                    <h3 class="text-2xl font-bold">{{ active_exams }}</h3>
+                </div>
+            </div>
+        </div>
+
+        <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+            <div class="px-6 py-4 border-b">
+                <h3 class="font-bold text-gray-800">Recent Registrations</h3>
+            </div>
+            <table class="w-full text-left">
+                <thead>
+                    <tr class="bg-gray-50 text-gray-600 text-sm uppercase">
+                        <th class="px-6 py-3">User</th>
+                        <th class="px-6 py-3">Role</th>
+                        <th class="px-6 py-3">Date</th>
+                        <th class="px-6 py-3">Status</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y">
+                    {% for u in recent_users %}
+                    <tr class="hover:bg-gray-50 transition">
+                        <td class="px-6 py-4 font-medium text-gray-800">
+                            {{ u.first_name }} {{ u.last_name }}
+                            <span class="block text-xs text-gray-500">{{ u.username }}</span>
+                        </td>
+                        <td class="px-6 py-4">
+                            {% if u.role == 'student' %}
+                                <span class="px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-xs font-semibold uppercase tracking-wide">Student</span>
+                            {% elif u.role == 'faculty' %}
+                                <span class="px-3 py-1 bg-green-100 text-green-800 rounded-full text-xs font-semibold uppercase tracking-wide">Faculty</span>
+                            {% else %}
+                                <span class="px-3 py-1 bg-purple-100 text-purple-800 rounded-full text-xs font-semibold uppercase tracking-wide">Admin</span>
+                            {% endif %}
+                        </td>
+                        <td class="px-6 py-4 text-sm text-gray-600">{{ u.date_joined|date:"M d, Y" }}</td>
+                        <td class="px-6 py-4">
+                            {% if u.is_active %}
+                                <span class="text-green-600 font-semibold"><i class="fas fa-circle text-[8px] mr-1"></i> Active</span>
+                            {% else %}
+                                <span class="text-red-500 font-semibold"><i class="fas fa-circle text-[8px] mr-1"></i> Inactive</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="4" class="px-6 py-8 text-center text-gray-500">
+                            <i class="fas fa-users-slash text-3xl mb-2 text-gray-300"></i>
+                            <p>No recent registrations found.</p>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+    </main>
+</div>
+{% endblock %}

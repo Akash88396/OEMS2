@@ -1,0 +1,121 @@
+{% extends 'base.html' %}
+
+{% block title %}ExamControl | Next-Gen AI Testing Platform{% endblock %}
+
+{% block content %}
+<style>
+    @keyframes blob {
+        0% { transform: translate(0px, 0px) scale(1); }
+        33% { transform: translate(30px, -50px) scale(1.1); }
+        66% { transform: translate(-20px, 20px) scale(0.9); }
+        100% { transform: translate(0px, 0px) scale(1); }
+    }
+    .animate-blob {
+        animation: blob 7s infinite;
+    }
+    .animation-delay-2000 {
+        animation-delay: 2s;
+    }
+    .animation-delay-4000 {
+        animation-delay: 4s;
+    }
+    .glass-card {
+        background: rgba(255, 255, 255, 0.7);
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+        border: 1px solid rgba(255, 255, 255, 0.5);
+    }
+</style>
+
+<div class="bg-gray-50 min-h-[calc(100vh-64px)] relative overflow-hidden font-sans">
+    
+    <div class="absolute top-0 -left-4 w-72 h-72 bg-purple-300 rounded-full mix-blend-multiply filter blur-2xl opacity-70 animate-blob"></div>
+    <div class="absolute top-0 -right-4 w-72 h-72 bg-teal-300 rounded-full mix-blend-multiply filter blur-2xl opacity-70 animate-blob animation-delay-2000"></div>
+    <div class="absolute -bottom-8 left-20 w-72 h-72 bg-blue-300 rounded-full mix-blend-multiply filter blur-2xl opacity-70 animate-blob animation-delay-4000"></div>
+
+    <div class="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-24 pb-20 text-center">
+        <div class="inline-block mb-4 px-4 py-1.5 rounded-full bg-blue-50 border border-blue-200 text-blue-700 font-semibold text-sm shadow-sm">
+            <i class="fas fa-rocket mr-2 animate-pulse"></i> Version 1.0 is Live
+        </div>
+        <h1 class="text-5xl md:text-7xl font-extrabold text-gray-900 tracking-tight mb-6">
+            The Future of <br class="hidden md:block"/>
+            <span class="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 via-teal-500 to-purple-600 animate-gradient-x">Secure Examinations</span>
+        </h1>
+        <p class="mt-4 max-w-2xl text-xl text-gray-600 mx-auto mb-10 leading-relaxed">
+            A highly secure, AI-monitored assessment platform built for modern educational institutions. Experience flawless grading, generative AI, and strict anti-cheat surveillance.
+        </p>
+        
+        <div class="flex flex-col sm:flex-row justify-center gap-5 relative z-10">
+            <a href="{% url 'login' %}" class="group bg-gradient-to-r from-blue-600 to-teal-500 text-white font-bold py-4 px-8 rounded-xl shadow-lg hover:shadow-teal-500/50 transition-all duration-300 transform hover:-translate-y-1 text-lg flex items-center justify-center">
+                <span>Access Portal</span>
+                <i class="fas fa-arrow-right ml-2 group-hover:translate-x-1 transition-transform"></i>
+            </a>
+            <a href="#" onclick="alert('Please contact your College Administrator to get your account credentials.')" class="bg-white text-gray-800 border-2 border-gray-200 font-bold py-4 px-8 rounded-xl shadow hover:border-blue-300 hover:bg-blue-50 transition-all duration-300 transform hover:-translate-y-1 text-lg flex items-center justify-center">
+                <i class="fas fa-id-badge mr-2 text-blue-500"></i> Request Access
+            </a>
+        </div>
+    </div>
+
+    <div class="w-full max-w-5xl mx-auto border-t border-gray-200/60 my-8"></div>
+
+    <div class="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 z-10">
+        <div class="text-center mb-16">
+            <h2 class="text-3xl md:text-4xl font-bold text-gray-800">Enterprise-Grade Architecture</h2>
+            <p class="text-gray-500 mt-3 text-lg">Built with Django, Tailwind CSS, and advanced Machine Learning APIs.</p>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            
+            <div class="group glass-card p-8 rounded-2xl hover:bg-white hover:shadow-2xl hover:shadow-teal-100 transition-all duration-300 transform hover:-translate-y-2 cursor-default">
+                <div class="w-14 h-14 bg-teal-50 text-teal-600 rounded-xl flex items-center justify-center text-2xl mb-6 group-hover:scale-110 group-hover:bg-teal-600 group-hover:text-white transition-all duration-300">
+                    <i class="fas fa-camera"></i>
+                </div>
+                <h3 class="text-xl font-bold text-gray-900 mb-3">AI Camera Surveillance</h3>
+                <p class="text-gray-500 leading-relaxed">Integrated TensorFlow BlazeFace tracking monitors head rotation and detects multiple faces to ensure absolute academic integrity.</p>
+            </div>
+
+            <div class="group glass-card p-8 rounded-2xl hover:bg-white hover:shadow-2xl hover:shadow-purple-100 transition-all duration-300 transform hover:-translate-y-2 cursor-default">
+                <div class="w-14 h-14 bg-purple-50 text-purple-600 rounded-xl flex items-center justify-center text-2xl mb-6 group-hover:scale-110 group-hover:bg-purple-600 group-hover:text-white transition-all duration-300">
+                    <i class="fas fa-brain"></i>
+                </div>
+                <h3 class="text-xl font-bold text-gray-900 mb-3">Generative AI Engine</h3>
+                <p class="text-gray-500 leading-relaxed">Faculty can leverage Google Gemini AI to instantly generate high-quality, complex question banks with just a single topic prompt.</p>
+            </div>
+
+            <div class="group glass-card p-8 rounded-2xl hover:bg-white hover:shadow-2xl hover:shadow-blue-100 transition-all duration-300 transform hover:-translate-y-2 cursor-default">
+                <div class="w-14 h-14 bg-blue-50 text-blue-600 rounded-xl flex items-center justify-center text-2xl mb-6 group-hover:scale-110 group-hover:bg-blue-600 group-hover:text-white transition-all duration-300">
+                    <i class="fas fa-check-double"></i>
+                </div>
+                <h3 class="text-xl font-bold text-gray-900 mb-3">Real-Time Auto Grading</h3>
+                <p class="text-gray-500 leading-relaxed">Exams are evaluated instantly upon submission. Students receive immediate feedback while removing manual grading overhead from faculty.</p>
+            </div>
+
+            <div class="group glass-card p-8 rounded-2xl hover:bg-white hover:shadow-2xl hover:shadow-red-100 transition-all duration-300 transform hover:-translate-y-2 cursor-default">
+                <div class="w-14 h-14 bg-red-50 text-red-600 rounded-xl flex items-center justify-center text-2xl mb-6 group-hover:scale-110 group-hover:bg-red-600 group-hover:text-white transition-all duration-300">
+                    <i class="fas fa-lock"></i>
+                </div>
+                <h3 class="text-xl font-bold text-gray-900 mb-3">Secure Exam Console</h3>
+                <p class="text-gray-500 leading-relaxed">Hardened browser interfaces block backwards navigation, warn on page refreshes, and maintain server-side timers to prevent cheating.</p>
+            </div>
+
+            <div class="group glass-card p-8 rounded-2xl hover:bg-white hover:shadow-2xl hover:shadow-orange-100 transition-all duration-300 transform hover:-translate-y-2 cursor-default">
+                <div class="w-14 h-14 bg-orange-50 text-orange-600 rounded-xl flex items-center justify-center text-2xl mb-6 group-hover:scale-110 group-hover:bg-orange-600 group-hover:text-white transition-all duration-300">
+                    <i class="fas fa-file-csv"></i>
+                </div>
+                <h3 class="text-xl font-bold text-gray-900 mb-3">Bulk CSV Processing</h3>
+                <p class="text-gray-500 leading-relaxed">Bypass manual data entry. Upload hundreds of questions in seconds using our heavily optimized, error-checked CSV ingestion pipeline.</p>
+            </div>
+
+            <div class="group glass-card p-8 rounded-2xl hover:bg-white hover:shadow-2xl hover:shadow-green-100 transition-all duration-300 transform hover:-translate-y-2 cursor-default">
+                <div class="w-14 h-14 bg-green-50 text-green-600 rounded-xl flex items-center justify-center text-2xl mb-6 group-hover:scale-110 group-hover:bg-green-600 group-hover:text-white transition-all duration-300">
+                    <i class="fas fa-random"></i>
+                </div>
+                <h3 class="text-xl font-bold text-gray-900 mb-3">Deterministic Shuffling</h3>
+                <p class="text-gray-500 leading-relaxed">Option arrays are shuffled uniquely for every student session using seeded algorithms, eliminating visual cheating without corrupting the database.</p>
+            </div>
+
+        </div>
+    </div>
+    
+</div>
+{% endblock %}

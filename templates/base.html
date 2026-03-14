@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Exam System{% endblock %}</title>
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#1e40af',  // Dark Blue
+                        secondary: '#10b981', // Emerald Green
+                        darkbg: '#0f172a',    // Dark Slate
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-gray-50 text-gray-800 font-sans min-h-screen flex flex-col">
+
+    <nav class="bg-primary text-white shadow-lg">
+        <div class="container mx-auto px-4 py-3 flex justify-between items-center">
+            <a href="{% url 'home' %}" class="text-2xl font-bold tracking-wide">
+                <i class="fas fa-graduation-cap mr-2"></i>ExamControl
+            </a>
+            <div>
+                {% if user.is_authenticated %}
+                    <span class="mr-4">Welcome, {{ user.username }}</span>
+                    <a href="{% url 'logout' %}" class="bg-red-500 hover:bg-red-600 px-3 py-1 rounded transition">Logout</a>
+                {% else %}
+                    <a href="{% url 'login' %}" class="hover:text-gray-200 transition">Login</a>
+                {% endif %}
+            </div>
+        </div>
+    </nav>
+
+    <main class="flex-grow container mx-auto px-4 py-6">
+        {% if messages %}
+            {% for message in messages %}
+                <div class="p-4 mb-4 text-sm text-white rounded-lg {% if message.tags == 'error' %}bg-red-500{% else %}bg-green-500{% endif %}" role="alert">
+                    {{ message }}
+                </div>
+            {% endfor %}
+        {% endif %}
+
+        {% block content %}
+        {% endblock %}
+    </main>
+
+    <footer class="bg-gray-800 text-gray-400 py-4 text-center mt-auto">
+        <p>&copy; 2024 Online Examination System. Final Year Project.</p>
+    </footer>
+
+</body>
+</html>

@@ -1,0 +1,133 @@
+{% extends 'base.html' %}
+
+{% block title %}Faculty Dashboard | ExamControl{% endblock %}
+
+{% block content %}
+<div class="flex h-[calc(100vh-80px)]">
+    
+    <aside class="w-64 bg-white shadow-lg border-r hidden md:block">
+        <div class="p-6">
+            <h2 class="text-xs uppercase text-gray-400 font-bold tracking-wider mb-4">Faculty Tools</h2>
+            <nav class="space-y-2">
+                <a href="#" class="flex items-center space-x-3 text-teal-700 bg-teal-50 px-4 py-3 rounded-lg font-medium">
+                    <i class="fas fa-chalkboard-teacher w-5"></i>
+                    <span>My Dashboard</span>
+                </a>
+                <a href="{% url 'question_bank' %}" class="flex items-center space-x-3 text-gray-600 hover:bg-gray-50 hover:text-teal-600 px-4 py-3 rounded-lg transition font-medium">
+                    <i class="fas fa-book-open w-5"></i>
+                    <span>Question Bank</span>
+                </a>
+                <a href="#" class="flex items-center space-x-3 text-gray-600 hover:bg-gray-50 hover:text-teal-600 px-4 py-3 rounded-lg transition font-medium">
+                    <i class="fas fa-file-signature w-5"></i>
+                    <span>Manage Exams</span>
+                </a>
+                <a href="#" class="flex items-center space-x-3 text-gray-600 hover:bg-gray-50 hover:text-teal-600 px-4 py-3 rounded-lg transition font-medium">
+                    <i class="fas fa-chart-bar w-5"></i>
+                    <span>Class Results</span>
+                </a>
+            </nav>
+        </div>
+    </aside>
+
+    <main class="flex-1 p-8 overflow-y-auto bg-gray-50">
+        
+        <div class="flex justify-between items-center mb-8">
+            <div>
+                <h1 class="text-3xl font-bold text-gray-800">Faculty Portal</h1>
+                <p class="text-gray-500 mt-1">Welcome back, Professor {{ user.last_name }}.</p>
+            </div>
+            <div class="space-x-2">
+                <a href="{% url 'add_question' %}" class="inline-block bg-white border border-teal-600 text-teal-600 px-4 py-2 rounded-lg shadow-sm hover:bg-teal-50 transition font-semibold">
+                    <i class="fas fa-plus mr-1"></i> Add Question
+                </a>
+                <a href="{% url 'create_exam' %}" class="inline-block bg-teal-600 text-white px-4 py-2 rounded-lg shadow hover:bg-teal-700 transition font-semibold">
+                    <i class="fas fa-plus mr-1"></i> Create Exam
+                </a>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+            <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100 flex items-center">
+                <div class="p-4 bg-blue-100 text-blue-600 rounded-full mr-4">
+                    <i class="fas fa-book text-xl"></i>
+                </div>
+                <div>
+                    <p class="text-sm text-gray-500 font-semibold uppercase tracking-wider">My Subjects</p>
+                    <h3 class="text-2xl font-bold text-gray-800">{{ subjects.count }}</h3>
+                </div>
+            </div>
+
+            <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100 flex items-center">
+                <div class="p-4 bg-teal-100 text-teal-600 rounded-full mr-4">
+                    <i class="fas fa-database text-xl"></i>
+                </div>
+                <div>
+                    <p class="text-sm text-gray-500 font-semibold uppercase tracking-wider">Questions in Bank</p>
+                    <h3 class="text-2xl font-bold text-gray-800">{{ total_questions }}</h3>
+                </div>
+            </div>
+
+            <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100 flex items-center">
+                <div class="p-4 bg-purple-100 text-purple-600 rounded-full mr-4">
+                    <i class="fas fa-clock text-xl"></i>
+                </div>
+                <div>
+                    <p class="text-sm text-gray-500 font-semibold uppercase tracking-wider">Active Exams</p>
+                    <h3 class="text-2xl font-bold text-gray-800">{{ active_exams_count }}</h3>
+                </div>
+            </div>
+        </div>
+
+        <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+            <div class="px-6 py-4 border-b bg-gray-50 flex justify-between items-center">
+                <h3 class="font-bold text-gray-800">Exams Managed by You</h3>
+            </div>
+            <div class="overflow-x-auto">
+                <table class="w-full text-left whitespace-nowrap">
+                    <thead>
+                        <tr class="text-gray-500 text-xs uppercase tracking-wider border-b">
+                            <th class="px-6 py-4 font-semibold">Exam Title</th>
+                            <th class="px-6 py-4 font-semibold">Subject</th>
+                            <th class="px-6 py-4 font-semibold">Schedule</th>
+                            <th class="px-6 py-4 font-semibold">Duration</th>
+                            <th class="px-6 py-4 font-semibold text-center">Questions</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-gray-100">
+                        {% for exam in exams %}
+                        <tr class="hover:bg-teal-50 transition duration-150">
+                            <td class="px-6 py-4">
+                                <p class="font-bold text-gray-800">{{ exam.title }}</p>
+                            </td>
+                            <td class="px-6 py-4">
+                                <span class="px-3 py-1 bg-gray-100 text-gray-700 rounded-full text-xs font-semibold">
+                                    {{ exam.subject.code }}
+                                </span>
+                            </td>
+                            <td class="px-6 py-4 text-sm text-gray-600">
+                                <div><i class="fas fa-play text-green-500 text-[10px] mr-1"></i> {{ exam.start_time|date:"M d, Y h:i A" }}</div>
+                                <div><i class="fas fa-stop text-red-500 text-[10px] mr-1"></i> {{ exam.end_time|date:"M d, Y h:i A" }}</div>
+                            </td>
+                            <td class="px-6 py-4 text-sm font-medium text-gray-600">
+                                {{ exam.duration_minutes }} Mins
+                            </td>
+                            <td class="px-6 py-4 text-center">
+                                <span class="bg-teal-100 text-teal-800 font-bold px-3 py-1 rounded-lg">{{ exam.questions.count }}</span>
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="5" class="px-6 py-12 text-center text-gray-500">
+                                <i class="fas fa-folder-open text-4xl mb-3 text-gray-300"></i>
+                                <p class="text-lg">You haven't created any exams yet.</p>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+    </main>
+</div>
+{% endblock %}

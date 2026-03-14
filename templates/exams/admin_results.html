@@ -1,0 +1,86 @@
+{% extends 'base.html' %}
+
+{% block title %}Result Viewer | ExamControl{% endblock %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto py-8">
+    
+    <div class="flex justify-between items-center mb-8">
+        <div>
+            <h1 class="text-3xl font-bold text-gray-800">Global Examination Results</h1>
+            <p class="text-gray-500 mt-1">Review student performance and AI proctoring logs.</p>
+        </div>
+        <a href="{% url 'admin_dashboard' %}" class="bg-gray-200 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-300 transition">
+            <i class="fas fa-arrow-left mr-2"></i> Back to Dashboard
+        </a>
+    </div>
+
+    <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+        <div class="overflow-x-auto">
+            <table class="w-full text-left whitespace-nowrap">
+                <thead>
+                    <tr class="bg-gray-50 text-gray-600 text-xs uppercase tracking-wider border-b">
+                        <th class="px-6 py-4 font-semibold">Student Name</th>
+                        <th class="px-6 py-4 font-semibold">Exam Title</th>
+                        <th class="px-6 py-4 font-semibold text-center">Final Score</th>
+                        <th class="px-6 py-4 font-semibold text-center">AI Warnings</th>
+                        <th class="px-6 py-4 font-semibold">Submission Time</th>
+                        <th class="px-6 py-4 font-semibold text-center">Action</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-gray-100">
+                    {% for result in results %}
+                    <tr class="hover:bg-blue-50 transition duration-150">
+                        <td class="px-6 py-4">
+                            <div class="flex items-center">
+                                <div class="h-8 w-8 rounded-full bg-blue-100 text-primary flex items-center justify-center font-bold mr-3">
+                                    {{ result.student.username|make_list|first|upper }}
+                                </div>
+                                <div>
+                                    <p class="font-medium text-gray-800">{{ result.student.first_name }} {{ result.student.last_name }}</p>
+                                    <p class="text-xs text-gray-500">ID: {{ result.student.username }}</p>
+                                </div>
+                            </div>
+                        </td>
+                        <td class="px-6 py-4">
+                            <p class="text-gray-800 font-medium">{{ result.exam.title }}</p>
+                            <p class="text-xs text-gray-500">{{ result.exam.subject.code }}</p>
+                        </td>
+                        <td class="px-6 py-4 text-center">
+                            <span class="text-lg font-bold text-gray-800">{{ result.score }}</span>
+                            <span class="text-xs text-gray-500">/ {{ result.exam.total_marks }}</span>
+                        </td>
+                        <td class="px-6 py-4 text-center">
+                            {% if result.proctoring_warnings > 0 %}
+                                <span class="px-3 py-1 bg-red-100 text-red-700 rounded-full font-bold text-sm border border-red-200 shadow-sm">
+                                    <i class="fas fa-exclamation-triangle mr-1"></i> {{ result.proctoring_warnings }}
+                                </span>
+                            {% else %}
+                                <span class="px-3 py-1 bg-green-100 text-green-700 rounded-full font-bold text-sm">
+                                    <i class="fas fa-shield-check mr-1"></i> Clean
+                                </span>
+                            {% endif %}
+                        </td>
+                        <td class="px-6 py-4 text-sm text-gray-600">
+                            {{ result.completed_at|date:"M d, Y h:i A" }}
+                        </td>
+                        <td class="px-6 py-4 text-center">
+                            <a href="{% url 'admin_exam_detail' result.id %}" class="text-primary hover:text-blue-800 font-medium text-sm hover:underline">
+                                View Details
+                            </a>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="6" class="px-6 py-12 text-center text-gray-500">
+                            <i class="fas fa-clipboard-list text-4xl mb-3 text-gray-300"></i>
+                            <p class="text-lg">No exam results available yet.</p>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}  
