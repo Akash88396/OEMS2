@@ -44,6 +44,12 @@
                         <span class="text-blue-600 mr-2">Q{{ forloop.counter }}.</span> 
                         {{ question.text }}
                     </h2>
+                    <div class="flex items-center space-x-3 shrink-0 ml-4">
+                        <span class="bg-gray-100 text-gray-600 text-xs px-2 py-1 rounded border font-bold">{{ question.marks }} Mark(s)</span>
+                        <button onclick="flagQuestion({{ question.id }}, this)" class="text-gray-400 hover:text-red-500 transition flex items-center text-xs border border-transparent hover:border-red-200 hover:bg-red-50 px-2 py-1 rounded" title="Report an issue with this question">
+                            <i class="fas fa-flag mr-1"></i> Flag
+                        </button>
+                    </div>
                     <span class="bg-gray-100 text-gray-600 text-xs px-2 py-1 rounded border">{{ question.marks }} Mark(s)</span>
                 </div>
                 
@@ -339,6 +345,42 @@
                 submitFinalExam();
             }
         });
+
+        // flag the question
+        // --- Flag Question Logic ---
+        function flagQuestion(questionId, btnElement) {
+            // Ask the student why they are flagging it
+            const reason = prompt("Please briefly explain the issue (e.g., 'Options are incorrect', 'Typo in question'):");
+            
+            if (reason && reason.trim() !== "") {
+                // Change icon to a spinner
+                const originalHTML = btnElement.innerHTML;
+                btnElement.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+                
+                fetch('/exams/api/report_question/', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({
+                        student_exam_id: studentExamId,
+                        question_id: questionId,
+                        description: reason
+                    })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.status === 'success' || data.status === 'info') {
+                        // Change button to solid red to indicate it's been flagged
+                        btnElement.innerHTML = '<i class="fas fa-flag text-red-500"></i> <span class="text-red-500">Flagged</span>';
+                        btnElement.classList.add('bg-red-50', 'border-red-200');
+                        btnElement.disabled = true; // Prevent multiple clicks
+                    }
+                })
+                .catch(err => {
+                    console.error("Error flagging question:", err);
+                    btnElement.innerHTML = originalHTML; // Reset on error
+                });
+            }
+        }
     </script>
 </body>
 </html>

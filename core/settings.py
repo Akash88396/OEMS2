@@ -16,17 +16,29 @@ import os
 from dotenv import load_dotenv
 load_dotenv()
 
+<<<<<<< HEAD
+=======
+
+>>>>>>> 4bca407d23c08ad9d8d61231bd4625e56b7544c0
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 sys.path.insert(0, os.path.join(BASE_DIR, 'apps'))
 
+<<<<<<< HEAD
 
+=======
+>>>>>>> 4bca407d23c08ad9d8d61231bd4625e56b7544c0
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/6.0/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
+<<<<<<< HEAD
 #SECRET_KEY = 'django-insecure-p_nd=60+t+_dyfh$x!)zrq7mp7z$o)4zl&gzg5_z3-j+9cw*6g'
 SECRET_KEY = os.getenv('SECRET_KEY')
+=======
+SECRET_KEY = os.getenv('SECRET_KEY')
+
+>>>>>>> 4bca407d23c08ad9d8d61231bd4625e56b7544c0
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.getenv("DEBUG", "False") == "True"
 
@@ -42,11 +54,18 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+<<<<<<< HEAD
      'apps.accounts',
 
     'apps.academics', 
     'apps.exams',
  
+=======
+    'apps.accounts',
+
+    'apps.academics', # We will create this later
+    'apps.exams',
+>>>>>>> 4bca407d23c08ad9d8d61231bd4625e56b7544c0
 ]
 
 MIDDLEWARE = [
@@ -137,3 +156,8 @@ AUTH_USER_MODEL = 'accounts.CustomUser'
 
 # Add this at the bottom of settings.py
 GEMINI_API_KEY = os.getenv('GEMINI_API_KEY')
+<<<<<<< HEAD
+=======
+
+LOGOUT_REDIRECT_URL = 'home'
+>>>>>>> 4bca407d23c08ad9d8d61231bd4625e56b7544c0

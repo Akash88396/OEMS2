@@ -1,0 +1,38 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+
+# Virtual environment
+venv/
+env/
+.venv/
+.env
+
+# Django-specific files and directories
+*.log
+*.pot
+local_settings.py
+db.sqlite3
+/media/
+/static/
+
+# Editor/OS-specific files
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+*.sublime-workspace
+*.sublime-project
+
+# Unit test / coverage reports
+htmlcov/
+.tox/
+.coverage
+.cache
+nosetests.xml
+coverage.xml
+
+# Packaging and distribution
+build/
+dist/
+*.egg-info/

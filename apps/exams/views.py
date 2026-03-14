@@ -18,7 +18,11 @@ import random
 
 from apps.accounts.decorators import admin_required,  faculty_required, student_required
 
+<<<<<<< HEAD
 from exams.models import Exam, StudentExam, StudentResponse, Question, ExamQuestion
+=======
+from exams.models import Exam, StudentExam, StudentResponse, Question, ExamQuestion,QuestionReport
+>>>>>>> 4bca407d23c08ad9d8d61231bd4625e56b7544c0
 from academics.models import Subject
 
 from exams.forms import QuestionForm, ExamForm
@@ -514,3 +518,62 @@ def ai_question_generator(request):
     return render(request, 'exams/ai_generator.html', context)
 
 
+<<<<<<< HEAD
+=======
+# Question flaging mechanism
+@login_required
+@csrf_exempt
+def report_question(request):
+    if request.method == 'POST':
+        data = json.loads(request.body)
+        student_exam_id = data.get('student_exam_id')
+        question_id = data.get('question_id')
+        description = data.get('description')
+
+        # Security checks
+        student_exam = get_object_or_404(StudentExam, id=student_exam_id, student=request.user)
+        question = get_object_or_404(Question, id=question_id)
+
+        # Create the report (get_or_create prevents duplicate spam)
+        report, created = QuestionReport.objects.get_or_create(
+            student=request.user,
+            exam=student_exam.exam,
+            question=question,
+            defaults={'description': description}
+        )
+        
+        if created:
+            return JsonResponse({'status': 'success', 'message': 'Question flagged successfully.'})
+        else:
+            return JsonResponse({'status': 'info', 'message': 'You have already flagged this question.'})
+
+    return JsonResponse({'status': 'error'}, status=400)
+
+# faculty resolves theflag questions
+@login_required
+@faculty_required
+def faculty_reports(request):
+    # Fetch all unresolved reports for exams created by this specific faculty
+    reports = QuestionReport.objects.filter(
+        exam__created_by=request.user, 
+        resolved=False
+    ).select_related('student', 'exam', 'question').order_by('-created_at')
+
+    context = {
+        'reports': reports,
+    }
+    return render(request, 'exams/faculty_reports.html', context)
+
+@login_required
+@faculty_required
+def resolve_report(request, report_id):
+    # Security: Ensure this faculty actually owns the exam the report is about
+    report = get_object_or_404(QuestionReport, id=report_id, exam__created_by=request.user)
+    
+    # Mark it as resolved and save
+    report.resolved = True
+    report.save()
+    
+    messages.success(request, f"Report from {report.student.username} has been marked as resolved.")
+    return redirect('faculty_reports')
+>>>>>>> 4bca407d23c08ad9d8d61231bd4625e56b7544c0

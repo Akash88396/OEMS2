@@ -1,0 +1,211 @@
+{% extends 'base.html' %}
+
+{% block title %}Manage Academics | Admin Dashboard{% endblock %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto py-8 px-4">
+    
+    <div class="mb-6">
+        <h1 class="text-3xl font-bold text-gray-800">Academic Structure</h1>
+        <p class="text-gray-500 mt-1">Manage overarching courses and their specific subjects.</p>
+    </div>
+
+    <div class="flex border-b border-gray-200 mb-8 space-x-8">
+        <button onclick="switchTab('courses')" id="tab-btn-courses" class="pb-4 font-bold text-lg transition-colors duration-200 {% if active_tab == 'courses' %}text-blue-600 border-b-2 border-blue-600{% else %}text-gray-500 hover:text-gray-700{% endif %}">
+            <i class="fas fa-graduation-cap mr-2"></i> Manage Courses
+        </button>
+        <button onclick="switchTab('subjects')" id="tab-btn-subjects" class="pb-4 font-bold text-lg transition-colors duration-200 {% if active_tab == 'subjects' %}text-blue-600 border-b-2 border-blue-600{% else %}text-gray-500 hover:text-gray-700{% endif %}">
+            <i class="fas fa-book mr-2"></i> Manage Subjects
+        </button>
+    </div>
+
+    <div id="tab-content-courses" class="{% if active_tab != 'courses' %}hidden{% endif %}">
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            <div class="lg:col-span-1">
+                <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden sticky top-6">
+                    <div class="bg-blue-600 px-6 py-4">
+                        <h2 class="text-white font-bold tracking-wide"><i class="fas fa-plus mr-2"></i> Add New Course</h2>
+                    </div>
+                    <form method="POST" class="p-6">
+                        {% csrf_token %}
+                        <input type="hidden" name="action" value="create_course">
+                        
+                        <div class="mb-4">
+                            <label class="block text-gray-700 font-bold mb-2 text-xs uppercase">Course Name <span class="text-red-500">*</span></label>
+                            <input type="text" name="name" required placeholder="e.g., B.Tech Computer Science" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
+                        </div>
+                        <div class="mb-4">
+                            <label class="block text-gray-700 font-bold mb-2 text-xs uppercase">Duration (Years)</label>
+                            <input type="number" name="duration_years" value="4" min="1" max="6" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
+                        </div>
+                        <div class="mb-6">
+                            <label class="block text-gray-700 font-bold mb-2 text-xs uppercase">Description</label>
+                            <textarea name="description" rows="2" placeholder="Brief description..." class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"></textarea>
+                        </div>
+                        <button type="submit" class="w-full bg-blue-600 text-white font-bold py-3 px-4 rounded-lg hover:bg-blue-700 transition shadow">Create Course</button>
+                    </form>
+                </div>
+            </div>
+
+            <div class="lg:col-span-2">
+                <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+                    <div class="bg-gray-50 border-b border-gray-200 px-6 py-4 flex justify-between items-center">
+                        <h3 class="font-bold text-gray-800">Active Courses</h3>
+                        <form method="GET" class="flex items-center">
+                            <input type="hidden" name="tab" value="courses">
+                            <input type="text" name="course_q" value="{{ course_q }}" placeholder="Search courses..." class="px-3 py-1 border border-gray-300 rounded-l-lg focus:outline-none text-sm">
+                            <button type="submit" class="bg-gray-200 px-3 py-1 border border-gray-300 border-l-0 rounded-r-lg hover:bg-gray-300"><i class="fas fa-search text-gray-600"></i></button>
+                        </form>
+                    </div>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left">
+                            <thead class="bg-white border-b border-gray-100">
+                                <tr class="text-gray-400 text-xs uppercase tracking-wider">
+                                    <th class="px-6 py-4 font-semibold">Course Name</th>
+                                    <th class="px-6 py-4 font-semibold text-center">Duration</th>
+                                    <th class="px-6 py-4 font-semibold text-center">Linked Subjects</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-gray-50">
+                                {% for course in courses %}
+                                <tr class="hover:bg-blue-50 transition">
+                                    <td class="px-6 py-4 font-bold text-gray-800 text-sm">
+                                        {{ course.name }}
+                                        {% if course.description %}
+                                            <p class="text-xs text-gray-500 font-normal mt-1 truncate max-w-xs">{{ course.description }}</p>
+                                        {% endif %}
+                                    </td>
+                                    <td class="px-6 py-4 text-center text-sm text-gray-600 font-semibold">{{ course.duration_years }} Years</td>
+                                    <td class="px-6 py-4 text-center font-bold text-gray-500">{{ course.subjects.count }}</td>
+                                </tr>
+                                {% empty %}
+                                <tr>
+                                    <td colspan="3" class="px-6 py-8 text-center text-gray-500">No courses found.</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="tab-content-subjects" class="{% if active_tab != 'subjects' %}hidden{% endif %}">
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            <div class="lg:col-span-1">
+                <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden sticky top-6">
+                    <div class="bg-teal-600 px-6 py-4">
+                        <h2 class="text-white font-bold tracking-wide"><i class="fas fa-plus mr-2"></i> Add New Subject</h2>
+                    </div>
+                    <form method="POST" class="p-6">
+                        {% csrf_token %}
+                        <input type="hidden" name="action" value="create_subject">
+                        
+                        <div class="mb-4">
+                            <label class="block text-gray-700 font-bold mb-2 text-xs uppercase">Belongs to Course</label>
+                            <select name="course_id" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 bg-white">
+                                <option value="">-- Standalone Subject --</option>
+                                {% for c in all_courses %}
+                                    <option value="{{ c.id }}">{{ c.code }} - {{ c.name }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        
+                        <div class="mb-4">
+                            <label class="block text-gray-700 font-bold mb-2 text-xs uppercase">Subject Code <span class="text-red-500">*</span></label>
+                            <input type="text" name="code" required placeholder="e.g., IT201" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500">
+                        </div>
+                        <div class="mb-4">
+                            <label class="block text-gray-700 font-bold mb-2 text-xs uppercase">Subject Name <span class="text-red-500">*</span></label>
+                            <input type="text" name="name" required placeholder="e.g., Database Mgmt" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500">
+                        </div>
+                        <div class="mb-6">
+                            <label class="block text-gray-700 font-bold mb-2 text-xs uppercase">Assign Faculty</label>
+                            <select name="faculty_id" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 bg-white">
+                                <option value="">-- Leave Unassigned --</option>
+                                {% for faculty in faculty_list %}
+                                    <option value="{{ faculty.id }}">{{ faculty.username }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <button type="submit" class="w-full bg-teal-600 text-white font-bold py-3 px-4 rounded-lg hover:bg-teal-700 transition shadow">Create Subject</button>
+                    </form>
+                </div>
+            </div>
+
+            <div class="lg:col-span-2">
+                <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+                    <div class="bg-gray-50 border-b border-gray-200 px-6 py-4 flex justify-between items-center">
+                        <h3 class="font-bold text-gray-800">Active Subjects</h3>
+                        <form method="GET" class="flex items-center">
+                            <input type="hidden" name="tab" value="subjects">
+                            <input type="text" name="subject_q" value="{{ subject_q }}" placeholder="Search subjects..." class="px-3 py-1 border border-gray-300 rounded-l-lg focus:outline-none text-sm">
+                            <button type="submit" class="bg-gray-200 px-3 py-1 border border-gray-300 border-l-0 rounded-r-lg hover:bg-gray-300"><i class="fas fa-search text-gray-600"></i></button>
+                        </form>
+                    </div>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left">
+                            <thead class="bg-white border-b border-gray-100">
+                                <tr class="text-gray-400 text-xs uppercase tracking-wider">
+                                    <th class="px-6 py-4 font-semibold">Code / Course</th>
+                                    <th class="px-6 py-4 font-semibold">Subject Name</th>
+                                    <th class="px-6 py-4 font-semibold">Assigned Faculty</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-gray-50">
+                                {% for subject in subjects %}
+                                <tr class="hover:bg-teal-50 transition">
+                                    <td class="px-6 py-4">
+                                        <span class="bg-teal-100 text-teal-700 font-bold px-2 py-1 rounded text-xs border border-teal-200">{{ subject.code }}</span>
+                                        {% if subject.course %}
+                                            <p class="text-[10px] text-gray-400 font-bold mt-1 uppercase tracking-wider">{{ subject.course.code }}</p>
+                                        {% endif %}
+                                    </td>
+                                    <td class="px-6 py-4 font-bold text-gray-800 text-sm">{{ subject.name }}</td>
+                                    <td class="px-6 py-4">
+                                        {% if subject.faculty %}
+                                            <div class="flex items-center space-x-2">
+                                                <div class="w-6 h-6 rounded-full bg-green-100 text-green-600 flex items-center justify-center text-xs font-bold uppercase">{{ subject.faculty.username|make_list|first }}</div>
+                                                <span class="text-sm font-medium text-gray-600">{{ subject.faculty.username }}</span>
+                                            </div>
+                                        {% else %}
+                                            <span class="text-xs font-medium text-red-400 bg-red-50 px-2 py-1 rounded border border-red-100">Unassigned</span>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                                {% empty %}
+                                <tr>
+                                    <td colspan="3" class="px-6 py-8 text-center text-gray-500">No subjects found.</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    function switchTab(tabName) {
+        // Update URL state so refresh doesn't break
+        const url = new URL(window.location);
+        url.searchParams.set('tab', tabName);
+        window.history.pushState({}, '', url);
+
+        // Hide all content
+        document.getElementById('tab-content-courses').classList.add('hidden');
+        document.getElementById('tab-content-subjects').classList.add('hidden');
+        
+        // Reset button styles
+        document.getElementById('tab-btn-courses').className = "pb-4 font-bold text-lg transition-colors duration-200 text-gray-500 hover:text-gray-700";
+        document.getElementById('tab-btn-subjects').className = "pb-4 font-bold text-lg transition-colors duration-200 text-gray-500 hover:text-gray-700";
+        
+        // Show active content and style button
+        document.getElementById('tab-content-' + tabName).classList.remove('hidden');
+        document.getElementById('tab-btn-' + tabName).className = "pb-4 font-bold text-lg transition-colors duration-200 text-blue-600 border-b-2 border-blue-600";
+    }
+</script>
+{% endblock %}
