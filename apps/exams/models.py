@@ -112,8 +112,6 @@ class StudentResponse(models.Model):
         return f"Response to {self.question.id} by {self.student_exam.student.username}"
     
 
-<<<<<<< HEAD
-=======
 class QuestionReport(models.Model):
     """Tracks questions flagged by students during an exam for errors"""
     student = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
@@ -130,4 +128,3 @@ class QuestionReport(models.Model):
 
     def __str__(self):
         return f"Flag on Q{self.question.id} by {self.student.username}"
->>>>>>> 4bca407d23c08ad9d8d61231bd4625e56b7544c0

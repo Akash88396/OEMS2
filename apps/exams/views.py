@@ -18,11 +18,7 @@ import random
 
 from apps.accounts.decorators import admin_required,  faculty_required, student_required
 
-<<<<<<< HEAD
-from exams.models import Exam, StudentExam, StudentResponse, Question, ExamQuestion
-=======
 from exams.models import Exam, StudentExam, StudentResponse, Question, ExamQuestion,QuestionReport
->>>>>>> 4bca407d23c08ad9d8d61231bd4625e56b7544c0
 from academics.models import Subject
 
 from exams.forms import QuestionForm, ExamForm
@@ -518,8 +514,6 @@ def ai_question_generator(request):
     return render(request, 'exams/ai_generator.html', context)
 
 
-<<<<<<< HEAD
-=======
 # Question flaging mechanism
 @login_required
 @csrf_exempt
@@ -576,4 +570,3 @@ def resolve_report(request, report_id):
     
     messages.success(request, f"Report from {report.student.username} has been marked as resolved.")
     return redirect('faculty_reports')
->>>>>>> 4bca407d23c08ad9d8d61231bd4625e56b7544c0

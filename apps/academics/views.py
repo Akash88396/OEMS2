@@ -1,8 +1,3 @@
-<<<<<<< HEAD
-from django.shortcuts import render
-
-# Create your views here.
-=======
 from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
 from apps.accounts.decorators import admin_required
@@ -72,4 +67,3 @@ def manage_subjects(request):
         'active_tab': active_tab,
     }
     return render(request, 'academics/manage_subjects.html', context)
->>>>>>> 4bca407d23c08ad9d8d61231bd4625e56b7544c0

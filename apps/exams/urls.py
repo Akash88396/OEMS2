@@ -1,9 +1,5 @@
 from django.urls import path
-<<<<<<< HEAD
-from .views import exam_console, save_answer,submit_exam, exam_result, log_warning, admin_result_viewer, admin_exam_detail, add_question, create_exam, exam_lobby, question_bank, bulk_upload_questions ,ai_question_generator
-=======
 from .views import exam_console, save_answer,submit_exam, exam_result, log_warning, admin_result_viewer, admin_exam_detail, add_question, create_exam, exam_lobby, question_bank, bulk_upload_questions ,ai_question_generator, report_question,faculty_reports, resolve_report
->>>>>>> 4bca407d23c08ad9d8d61231bd4625e56b7544c0
 
 urlpatterns = [
     path('lobby/<int:exam_id>/', exam_lobby, name='exam_lobby'),
@@ -19,12 +15,9 @@ urlpatterns = [
     path('faculty/question-bank/', question_bank, name='question_bank'),
     path('faculty/bulk-upload/', bulk_upload_questions, name='bulk_upload_questions'),
     path('faculty/ai-generator/', ai_question_generator, name='ai_question_generator'),
-<<<<<<< HEAD
-=======
 
     path('api/report_question/', report_question, name='report_question'),
 
     path('faculty/reports/', faculty_reports, name='faculty_reports'),
     path('faculty/reports/resolve/<int:report_id>/', resolve_report, name='resolve_report'),
->>>>>>> 4bca407d23c08ad9d8d61231bd4625e56b7544c0
 ]
